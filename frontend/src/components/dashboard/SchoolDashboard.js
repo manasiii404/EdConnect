@@ -3,11 +3,14 @@ import React, { useState, useEffect } from 'react';
 import api from '../../utils/api';
 import DashboardLayout from './DashboardLayout';
 import { getUserInfo } from '../../utils/auth';
+import MeetingNotification from './MeetingNotification';
 
 const SchoolDashboard = () => {
+  const [loadingRequests, setLoadingRequests] = useState(false);
   const [activeTab, setActiveTab] = useState('dashboard');
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [activeMeetingUrl, setActiveMeetingUrl] = useState("https://go-krushna.daily.co/FgPd5KEtqkLKgCu6vXk3");
   const [error, setError] = useState(null);
   const [editMode, setEditMode] = useState(false);
   const [formData, setFormData] = useState({
@@ -15,6 +18,21 @@ const SchoolDashboard = () => {
     location: '',
     email: '',
   });
+  const [showAddClassModal, setShowAddClassModal] = useState(false);
+  const [classFormData, setClassFormData] = useState({
+    name: '',
+    subject: ''
+  });
+  const [classes, setClasses] = useState([]);
+  const [showRequestModal, setShowRequestModal] = useState(false);
+  const [requestFormData, setRequestFormData] = useState({
+    classId: '',
+    subject: '',
+    topic: '',
+    description: '',
+    requiredHours: ''
+  });
+  const [volunteerRequests, setVolunteerRequests] = useState([]);
 
   const userInfo = getUserInfo();
 
@@ -38,6 +56,43 @@ const SchoolDashboard = () => {
     fetchProfile();
   }, []);
 
+  useEffect(() => {
+    const fetchClasses = async () => {
+      try {
+        const { data } = await api.get('/classes');
+        setClasses(data);
+      } catch (err) {
+        setError('Failed to load classes');
+      }
+    };
+    
+    fetchClasses();
+  }, []);
+
+  useEffect(() => {
+    // In the fetchVolunteerRequests function
+const fetchVolunteerRequests = async () => {
+  try {
+    setLoadingRequests(true);
+    const { data } = await api.get('/volunteer-requests');
+    // Add fallbacks for potentially undefined values
+    const requestsWithFallbacks = data.map(request => ({
+      ...request,
+      school: request.school || { name: 'Unknown School', location: 'Unknown' },
+      class: request.class || { name: 'Unknown Class' }
+    }));
+    setVolunteerRequests(requestsWithFallbacks);
+  } catch (err) {
+    console.error('Error details:', err.response);
+    setError(err.response?.data?.message || 'Failed to load volunteer requests');
+  } finally {
+    setLoadingRequests(false);
+  }
+};
+    
+    fetchVolunteerRequests();
+  }, []);
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -59,13 +114,86 @@ const SchoolDashboard = () => {
     }
   };
 
-  // Mock data for classes and volunteers
-  const classes = [
-    { id: 1, name: 'Class 10A', subject: 'Mathematics', students: 30, teacher: 'Mr. Rajesh Kumar' },
-    { id: 2, name: 'Class 9B', subject: 'Science', students: 28, teacher: 'Mr. Ankit Sharma' },
-    { id: 3, name: 'Class 8C', subject: 'English', students: 32, teacher: 'Ms. Priya Gupta' },
-  ];
+  const handleClassInputChange = (e) => {
+    setClassFormData({
+      ...classFormData,
+      [e.target.name]: e.target.value
+    });
+  };
 
+  const handleAddClass = async (e) => {
+    e.preventDefault();
+    try {
+      setLoading(true);
+      const { data } = await api.post('/classes', classFormData);
+      setClasses([...classes, data]);
+      setShowAddClassModal(false);
+      setClassFormData({ name: '', subject: '' });
+    } catch (err) {
+      setError('Failed to add class');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteClass = async (id) => {
+    try {
+      await api.delete(`/classes/${id}`);
+      setClasses(classes.filter(c => c.id !== id));
+    } catch (err) {
+      setError('Failed to delete class');
+    }
+  };
+
+  const handleRequestInputChange = (e) => {
+    setRequestFormData({
+      ...requestFormData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleRequestSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      setLoading(true);
+      // Add school name to the request form data
+      const updatedRequestData = {
+        ...requestFormData,
+        schoolName: profile?.profile?.name || '', // Add the school name here
+      };
+  
+      const { data } = await api.post('/api/volunteer-requests', updatedRequestData);
+      setVolunteerRequests([data, ...volunteerRequests]);
+      setShowRequestModal(false);
+      setRequestFormData({
+        classId: '',
+        subject: '',
+        topic: '',
+        description: '',
+        requiredHours: ''
+      });
+    } catch (err) {
+      setError('Failed to create volunteer request');
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+
+  const handleCancelRequest = async (id) => {
+    try {
+      const { data } = await api.put(`/api/volunteer-requests/${id}/cancel`);
+      setVolunteerRequests(
+        volunteerRequests.map(request => 
+          request.id === id ? data : request
+        )
+      );
+    } catch (err) {
+      setError('Failed to cancel request');
+    }
+  };
+
+  // Mock data for volunteers
   const volunteers = [
     { id: 1, name: 'Dr. Sunil Kumar', subject: 'Mathematics', rating: 4.8, status: 'Active' },
     { id: 2, name: 'Prof. Neha Gupta', subject: 'Science', rating: 4.9, status: 'Active' },
@@ -133,7 +261,20 @@ const SchoolDashboard = () => {
           </button>
         </nav>
       </div>
-
+      {activeTab === 'liveClasses' && (
+  <div>
+    <MeetingNotification meetingUrl={activeMeetingUrl} />
+    
+    <h3 className="text-xl font-semibold text-secondary-800 mb-4">Live Classes</h3>
+    <p className="text-gray-600 mb-6">Join live classes hosted by volunteer teachers.</p>
+    
+    {!activeMeetingUrl ? (
+      <div className="bg-gray-50 rounded-lg border border-gray-200 p-6 text-center">
+        <p className="text-gray-500">No live classes scheduled at the moment.</p>
+      </div>
+    ) : null}
+  </div>
+)}
       {/* Dashboard Tab */}
       {activeTab === 'dashboard' && (
         <div>
@@ -151,7 +292,7 @@ const SchoolDashboard = () => {
             <div className="bg-yellow-50 p-6 rounded-lg shadow-sm border border-yellow-100">
               <h3 className="text-lg font-semibold text-yellow-800 mb-2">Pending Requests</h3>
               <p className="text-yellow-600 text-2xl font-bold">
-                {volunteers.filter(v => v.status === 'Pending').length}
+                {volunteerRequests.filter(v => v.status === 'pending').length}
               </p>
             </div>
           </div>
@@ -185,105 +326,116 @@ const SchoolDashboard = () => {
         <div>
           <div className="flex justify-between items-center mb-6">
             <h3 className="text-xl font-semibold text-secondary-800">Manage Classes</h3>
-            <button className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-md transition duration-300 text-sm">
+            <button 
+              onClick={() => setShowAddClassModal(true)} 
+              className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-md transition duration-300 text-sm"
+            >
               Add New Class
             </button>
           </div>
 
-          <div className="overflow-x-auto bg-white rounded-lg border border-gray-200">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Class Name
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Subject
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Students
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Teacher
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
-                  </th>
+          {classes.length > 0 ? (
+            <div className="overflow-x-auto bg-white rounded-lg border border-gray-200">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Class Name
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Subject
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Created At
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Actions
+                    </th>
                   </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {classes.map((classItem) => (
-                  <tr key={classItem.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {classItem.name}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {classItem.subject}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {classItem.students}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {classItem.teacher}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      <div className="flex space-x-2">
-                        <button className="text-blue-600 hover:text-blue-800">
-                          Edit
-                        </button>
-                        <button className="text-green-600 hover:text-green-800">
-                          Manage
-                        </button>
-                        <button className="text-red-600 hover:text-red-800">
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {classes.map((classItem) => (
+                    <tr key={classItem.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        {classItem.name}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {classItem.subject}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {new Date(classItem.createdAt).toLocaleDateString()}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <button 
+                          onClick={() => handleDeleteClass(classItem.id)}
+                          className="text-red-600 hover:text-red-900"
+                        >
                           Delete
                         </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          <div className="mt-8">
-            <h3 className="text-xl font-semibold text-secondary-800 mb-4">Upload Syllabus</h3>
-            <div className="bg-white p-6 rounded-lg border border-gray-200">
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Select Class
-                </label>
-                <select className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500">
-                  <option value="">Select a class</option>
-                  {classes.map(c => (
-                    <option key={c.id} value={c.id}>{c.name} - {c.subject}</option>
+                      </td>
+                    </tr>
                   ))}
-                </select>
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Upload File
-                </label>
-                <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
-                  <div className="space-y-1 text-center">
-                    <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
-                      <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                    <div className="flex text-sm text-gray-600">
-                      <label className="relative cursor-pointer bg-white rounded-md font-medium text-primary-600 hover:text-primary-500 focus-within:outline-none">
-                        <span>Upload a file</span>
-                        <input id="file-upload" name="file-upload" type="file" className="sr-only" />
-                      </label>
-                      <p className="pl-1">or drag and drop</p>
-                    </div>
-                    <p className="text-xs text-gray-500">PDF, DOC, DOCX up to 10MB</p>
-                  </div>
-                </div>
-              </div>
-              <button className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-md transition duration-300 text-sm">
-                Upload Syllabus
-              </button>
+                </tbody>
+              </table>
             </div>
-          </div>
+          ) : (
+            <div className="bg-white rounded-lg border border-gray-200 p-6 text-center text-gray-500">
+              No classes added yet. Click "Add New Class" to create your first class.
+            </div>
+          )}
+
+          {/* Add Class Modal */}
+          {showAddClassModal && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <div className="bg-white rounded-lg p-6 w-full max-w-md">
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Add New Class</h3>
+                <form onSubmit={handleAddClass}>
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Class Name
+                    </label>
+                    <input
+                      type="text"
+                      name="name"
+                      value={classFormData.name}
+                      onChange={handleClassInputChange}
+                      className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
+                      required
+                    />
+                  </div>
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Subject
+                    </label>
+                    <input
+                      type="text"
+                      name="subject"
+                      value={classFormData.subject}
+                      onChange={handleClassInputChange}
+                      className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
+                      required
+                    />
+                  </div>
+                  <div className="flex justify-end space-x-3">
+                    <button
+                      type="button"
+                      onClick={() => setShowAddClassModal(false)}
+                      className="bg-gray-200 text-gray-800 px-4 py-2 rounded-md transition duration-300 text-sm"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-md transition duration-300 text-sm"
+                      disabled={loading}
+                    >
+                      {loading ? 'Adding...' : 'Add Class'}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -292,7 +444,10 @@ const SchoolDashboard = () => {
         <div>
           <div className="flex justify-between items-center mb-6">
             <h3 className="text-xl font-semibold text-secondary-800">Volunteer Management</h3>
-            <button className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-md transition duration-300 text-sm">
+            <button 
+              onClick={() => setShowRequestModal(true)} 
+              className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-md transition duration-300 text-sm"
+            >
               Request Volunteer
             </button>
           </div>
@@ -344,64 +499,179 @@ const SchoolDashboard = () => {
             ))}
           </div>
 
-          <div className="mt-8">
-            <h4 className="text-lg font-medium text-secondary-700 mb-4">Request New Volunteer</h4>
-            <div className="bg-white p-6 rounded-lg border border-gray-200">
-              <form className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
+          <h4 className="text-lg font-medium text-secondary-700 mb-4 mt-8">Volunteer Requests</h4>
+          <div className="bg-white rounded-lg border border-gray-200">
+            {volunteerRequests.length > 0 ? (
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Class
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Subject
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Topic
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Required Hours
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Status
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {volunteerRequests.map((request) => (
+                      <tr key={request.id} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                          {request.Class?.name || 'Unknown'}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {request.subject}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {request.topic}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {request.requiredHours}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                            request.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 
+                            request.status === 'assigned' ? 'bg-green-100 text-green-800' :
+                            request.status === 'completed' ? 'bg-blue-100 text-blue-800' :
+                            'bg-red-100 text-red-800'
+                          }`}>
+                            {request.status === 'pending' ? 'Pending' :
+                             request.status === 'assigned' ? 'Assigned' :
+                             request.status === 'completed' ? 'Completed' :
+                             'Cancelled'}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {request.status === 'pending' && (
+                            <button 
+                              onClick={() => handleCancelRequest(request.id)}
+                              className="text-red-600 hover:text-red-900"
+                            >
+                              Cancel
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="p-6 text-center text-gray-500">
+                No volunteer requests yet. Click "Request Volunteer" to create one.
+              </div>
+            )}
+          </div>
+
+          {/* Request Volunteer Modal */}
+          {showRequestModal && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <div className="bg-white rounded-lg p-6 w-full max-w-md">
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Request Volunteer</h3>
+                <form onSubmit={handleRequestSubmit}>
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Class
+                    </label>
+                    <select
+                      name="classId"
+                      value={requestFormData.classId}
+                      onChange={handleRequestInputChange}
+                      className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
+                      required
+                    >
+                      <option value="">Select a class</option>
+                      {classes.map(c => (
+                        <option key={c.id} value={c.id}>{c.name} - {c.subject}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="mb-4">
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Subject
                     </label>
                     <input
                       type="text"
+                      name="subject"
+                      value={requestFormData.subject}
+                      onChange={handleRequestInputChange}
                       className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
-                      placeholder="e.g. Mathematics, Science"
+                      required
                     />
                   </div>
-                  <div>
+                  <div className="mb-4">
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Class
+                      Topic
                     </label>
-                    <select className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500">
-                      <option value="">Select a class</option>
-                      {classes.map(c => (
-                        <option key={c.id} value={c.id}>{c.name}</option>
-                      ))}
-                    </select>
+                    <input
+                      type="text"
+                      name="topic"
+                      value={requestFormData.topic}
+                      onChange={handleRequestInputChange}
+                      className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
+                      required
+                    />
                   </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Topic/Curriculum
-                  </label>
-                  <input
-                    type="text"
-                    className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
-                    placeholder="e.g. Algebra, Chemistry Experiments"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Details
-                  </label>
-                  <textarea
-                    rows={4}
-                    className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
-                    placeholder="Describe what you need help with..."
-                  />
-                </div>
-                <div className="flex justify-end">
-                  <button
-                    type="submit"
-                    className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-md transition duration-300 text-sm"
-                  >
-                    Submit Request
-                  </button>
-                </div>
-              </form>
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Required Hours
+                    </label>
+                    <input
+                      type="number"
+                      name="requiredHours"
+                      value={requestFormData.requiredHours}
+                      onChange={handleRequestInputChange}
+                      className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
+                      min="1"
+                      required
+                    />
+                  </div>
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Description
+                    </label>
+                    <textarea
+                      name="description"
+                      value={requestFormData.description}
+                      onChange={handleRequestInputChange}
+                      rows="4"
+                      className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
+                      required
+                    ></textarea>
+                  </div>
+                  <div className="flex justify-end space-x-3">
+                    <button
+                      type="button"
+                      onClick={() => setShowRequestModal(false)}
+                      className="bg-gray-200 text-gray-800 px-4 py-2 rounded-md transition duration-300 text-sm"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-md transition duration-300 text-sm"
+                      disabled={loading}
+                    >
+                      {loading ? 'Submitting...' : 'Submit Request'}
+                    </button>
+                  </div>
+                </form>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       )}
 
@@ -440,61 +710,60 @@ const SchoolDashboard = () => {
                     Email Address
                   </label>
                   <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
-                    required
-                  />
-                </div>
-                <div>
-                  <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1">
-                    Location
-                  </label>
-                  <input
-                    type="text"
-                    id="location"
-                    name="location"
-                    value={formData.location}
-                    onChange={handleChange}
-                    className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
-                    required
-                  />
-                </div>
-              </div>
-              <div className="flex justify-end">
-                <button
-                  type="submit"
-                  className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md transition duration-300 text-sm"
-                  disabled={loading}
-                >
-                  {loading ? 'Saving...' : 'Save Changes'}
-                </button>
-              </div>
-            </form>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-gray-50 p-4 rounded-md">
-                <p className="text-sm font-medium text-gray-500">School Name</p>
-                <p className="text-base font-medium text-gray-900 mt-1">{profile?.profile?.name}</p>
-              </div>
-              <div className="bg-gray-50 p-4 rounded-md">
-                <p className="text-sm font-medium text-gray-500">Email Address</p>
-                <p className="text-base font-medium text-gray-900 mt-1">{profile?.email}</p>
-              </div>
-              <div className="bg-gray-50 p-4 rounded-md">
-                <p className="text-sm font-medium text-gray-500">Location</p>
-                <p className="text-base font-medium text-gray-900 mt-1">{profile?.profile?.location}</p>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-    </DashboardLayout>
-  );
+                   type="email"
+                   id="email"
+                   name="email"
+                   value={formData.email}
+                   onChange={handleChange}
+                   className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
+                   required
+                 />
+               </div>
+               <div>
+                 <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1">
+                   Location
+                 </label>
+                 <input
+                   type="text"
+                   id="location"
+                   name="location"
+                   value={formData.location}
+                   onChange={handleChange}
+                   className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
+                   required
+                 />
+               </div>
+             </div>
+             <div className="flex justify-end">
+               <button
+                 type="submit"
+                 className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md transition duration-300 text-sm"
+                 disabled={loading}
+               >
+                 {loading ? 'Saving...' : 'Save Changes'}
+               </button>
+             </div>
+           </form>
+         ) : (
+           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+             <div className="bg-gray-50 p-4 rounded-md">
+               <p className="text-sm font-medium text-gray-500">School Name</p>
+               <p className="text-base font-medium text-gray-900 mt-1">{profile?.profile?.name}</p>
+             </div>
+             <div className="bg-gray-50 p-4 rounded-md">
+               <p className="text-sm font-medium text-gray-500">Email Address</p>
+               <p className="text-base font-medium text-gray-900 mt-1">{profile?.email}</p>
+             </div>
+             <div className="bg-gray-50 p-4 rounded-md">
+               <p className="text-sm font-medium text-gray-500">Location</p>
+               <p className="text-base font-medium text-gray-900 mt-1">{profile?.profile?.location}</p>
+             </div>
+           </div>
+         )}
+       </div>
+     )}
+   </DashboardLayout>
+ );
 };
 
 export default SchoolDashboard;
-                

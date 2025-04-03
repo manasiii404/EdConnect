@@ -3,6 +3,8 @@ import React, { useState, useEffect } from 'react';
 import api from '../../utils/api';
 import DashboardLayout from './DashboardLayout';
 import { getUserInfo } from '../../utils/auth';
+import VideoConferencing from './VideoConferencing';
+// import SyllabusList from './SyllabusList';
 
 const VolunteerDashboard = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -133,6 +135,17 @@ const VolunteerDashboard = () => {
             Opportunities
           </button>
           <button
+  onClick={() => setActiveTab('liveClasses')}
+  className={`${
+    activeTab === 'liveClasses'
+      ? 'border-primary-500 text-primary-600'
+      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+  } whitespace-nowrap py-4 px-4 md:px-6 border-b-2 font-medium text-sm`}
+>
+  Live Classes
+</button>
+         
+          <button
             onClick={() => setActiveTab('sessions')}
             className={`${
               activeTab === 'sessions'
@@ -211,23 +224,14 @@ const VolunteerDashboard = () => {
             </div>
           )}
 
-          <h3 className="text-xl font-semibold text-secondary-800 mb-4 mt-8">Featured Opportunities</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {opportunities.slice(0, 2).map(opportunity => (
-              <div key={opportunity.id} className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-                <h4 className="text-lg font-medium text-gray-900">{opportunity.subject}: {opportunity.topic}</h4>
-                <p className="text-sm text-gray-600 mt-1">{opportunity.school} - {opportunity.class}</p>
-                <p className="text-sm text-gray-500 mt-1">Date: {opportunity.date}</p>
-                <div className="mt-4 flex justify-end">
-                  <button className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-md transition duration-300 text-sm">
-                    Apply
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
+          
         </div>
       )}
+      {activeTab === 'liveClasses' && (
+  <div>
+    <VideoConferencing userType="volunteer" />
+  </div>
+)}
 
       {/* Opportunities Tab */}
       {activeTab === 'opportunities' && (
@@ -502,57 +506,7 @@ const VolunteerDashboard = () => {
             </div>
           )}
           
-          <div className="mt-8">
-            <h3 className="text-lg font-semibold text-secondary-800 mb-4">Upload Teaching Materials</h3>
-            <div className="bg-white p-6 rounded-lg border border-gray-200">
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Material Type
-                </label>
-                <select className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500">
-                  <option value="">Select type</option>
-                  <option value="slides">Presentation Slides</option>
-                  <option value="document">Document</option>
-                  <option value="worksheet">Worksheet</option>
-                  <option value="video">Video</option>
-                </select>
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Subject
-                </label>
-                <select className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500">
-                  <option value="">Select subject</option>
-                  <option value="Mathematics">Mathematics</option>
-                  <option value="Science">Science</option>
-                  <option value="English">English</option>
-                </select>
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Upload File
-                </label>
-                <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
-                  <div className="space-y-1 text-center">
-                    <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
-                      <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                    <div className="flex text-sm text-gray-600">
-                      <label className="relative cursor-pointer bg-white rounded-md font-medium text-primary-600 hover:text-primary-500 focus-within:outline-none">
-                        <span>Upload a file</span>
-                        <input id="file-upload" name="file-upload" type="file" className="sr-only" />
-                      </label>
-                      <p className="pl-1">or drag and drop</p>
-                    </div>
-                    <p className="text-xs text-gray-500">PDF, PPTX, DOCX, MP4 up to 50MB</p>
-                  </div>
-                </div>
-              </div>
-              <button className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-md transition duration-300 text-sm">
-                Upload Material
-              </button>
-            </div>
-          </div>
+          
         </div>
       )}
     </DashboardLayout>

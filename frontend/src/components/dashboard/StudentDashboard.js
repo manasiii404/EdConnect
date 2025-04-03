@@ -3,6 +3,8 @@ import React, { useEffect, useState } from 'react';
 import api from '../../utils/api';
 import DashboardLayout from './DashboardLayout';
 import { getUserInfo } from '../../utils/auth';
+import StudentChatbot from '../chatbot/StudentChatbot';
+import VideoConferencing from './VideoConferencing';
 
 const StudentDashboard = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -100,6 +102,16 @@ const StudentDashboard = () => {
             Dashboard
           </button>
           <button
+  onClick={() => setActiveTab('liveClasses')}
+  className={`${
+    activeTab === 'liveClasses'
+      ? 'border-primary-500 text-primary-600'
+      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+  } whitespace-nowrap py-4 px-4 md:px-6 border-b-2 font-medium text-sm`}
+>
+  Live Classes
+</button>
+          <button
             onClick={() => setActiveTab('profile')}
             className={`${
               activeTab === 'profile'
@@ -108,6 +120,16 @@ const StudentDashboard = () => {
             } whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm`}
           >
             Profile
+          </button>
+          <button
+            onClick={() => setActiveTab('chatbot')}
+            className={`${
+              activeTab === 'chatbot'
+                ? 'border-primary-500 text-primary-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            } whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm`}
+          >
+            Study Assistant
           </button>
         </nav>
       </div>
@@ -193,6 +215,11 @@ const StudentDashboard = () => {
           </div>
         </div>
       )}
+      {activeTab === 'liveClasses' && (
+  <div>
+    <VideoConferencing userType="student" />
+  </div>
+)}
 
       {/* Profile Tab */}
       {activeTab === 'profile' && (
@@ -315,6 +342,18 @@ const StudentDashboard = () => {
               </div>
             </div>
           )}
+        </div>
+      )}
+      
+      {/* Chatbot Tab */}
+      {activeTab === 'chatbot' && (
+        <div>
+          <h3 className="text-xl font-semibold text-secondary-800 mb-4">Study Assistant</h3>
+          <p className="text-gray-600 mb-6">
+            Upload PDF study materials and ask questions to enhance your learning. 
+            The assistant will help you understand concepts better.
+          </p>
+          <StudentChatbot />
         </div>
       )}
     </DashboardLayout>
