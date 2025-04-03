@@ -1,7 +1,8 @@
+// frontend/src/App.js
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { isAuthenticated, getUserType } from './utils/auth';
-import './App.css';
+import { isAuthenticated } from './utils/auth';
+import './index.css';
 
 // Pages
 import HomePage from './pages/HomePage';

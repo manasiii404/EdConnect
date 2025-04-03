@@ -1,15 +1,25 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import './Login.css';
 
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [formData, setFormData] = useState({
+    email: '',
+    password: ''
+  });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  
   const navigate = useNavigate();
+
+  const { email, password } = formData;
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -23,13 +33,11 @@ const Login = () => {
         password,
       });
       
-      // Save user info and token to localStorage
       localStorage.setItem('userInfo', JSON.stringify(data));
-      
-      // Redirect to dashboard based on user type
       navigate(`/dashboard/${data.userType}`);
+      
     } catch (error) {
-      setError(error.response?.data?.message || 'An error occurred');
+      setError(error.response?.data?.message || 'Login failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -38,42 +46,61 @@ const Login = () => {
   return (
     <div className="login-container">
       <div className="login-card">
-        <h2>Login to EdConnect</h2>
+        <div className="logo-container">
+          <h2>EdConnect</h2>
+        </div>
+        
+        <h2 className="login-title">Welcome Back</h2>
+        <p className="login-subtitle">Please enter your credentials to login</p>
+        
         {error && <div className="error-message">{error}</div>}
         
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="login-form">
           <div className="form-group">
             <label htmlFor="email">Email Address</label>
             <input
-              type="email"
               id="email"
+              name="email"
+              type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={handleChange}
               required
+              placeholder="Enter your email"
             />
           </div>
           
           <div className="form-group">
             <label htmlFor="password">Password</label>
             <input
-              type="password"
               id="password"
+              name="password"
+              type="password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={handleChange}
               required
+              placeholder="Enter your password"
             />
           </div>
           
-          <button type="submit" className="login-button" disabled={loading}>
-            {loading ? 'Logging in...' : 'Login'}
+          <div className="forgot-password">
+            <Link to="/forgot-password">Forgot password?</Link>
+          </div>
+          
+          <button 
+            type="submit" 
+            className="login-button" 
+            disabled={loading}
+          >
+            {loading ? (
+              <span className="button-loader"></span>
+            ) : (
+              'Login'
+            )}
           </button>
         </form>
         
         <div className="register-link">
-          <p>Don't have an account?</p>
-          <button onClick={() => navigate('/')} className="register-button">
-            Register
-          </button>
+          <p>Don't have an account? <Link to="/">Create account</Link></p>
         </div>
       </div>
     </div>
