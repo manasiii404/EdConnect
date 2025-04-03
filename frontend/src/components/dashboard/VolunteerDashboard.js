@@ -4,6 +4,7 @@ import api from '../../utils/api';
 import DashboardLayout from './DashboardLayout';
 import { getUserInfo } from '../../utils/auth';
 import VideoConferencing from './VideoConferencing';
+import FeedbackList from '../feedback/FeedbackList';
 // import SyllabusList from './SyllabusList';
 
 const VolunteerDashboard = () => {
@@ -11,6 +12,10 @@ const VolunteerDashboard = () => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [feedback, setFeedback] = useState([]);
+const [averageRating, setAverageRating] = useState(0);
+const [loadingFeedback, setLoadingFeedback] = useState(false);
+ 
   const [editMode, setEditMode] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -48,7 +53,25 @@ const VolunteerDashboard = () => {
       [e.target.name]: e.target.value,
     });
   };
-
+  const fetchFeedback = async () => {
+    try {
+      setLoadingFeedback(true);
+      const { data } = await api.get(`/feedback/volunteer/${userInfo.id}`);
+      setFeedback(data.feedback);
+      setAverageRating(data.averageRating);
+    } catch (error) {
+      console.error('Error fetching feedback:', error);
+    } finally {
+      setLoadingFeedback(false);
+    }
+  };
+   
+  // Call this function in useEffect
+  useEffect(() => {
+    // ... existing code
+    fetchFeedback();
+  }, []);
+   
   const handleSkillsChange = (e) => {
     const options = e.target.options;
     const selectedSkills = [];
@@ -124,6 +147,17 @@ const VolunteerDashboard = () => {
           >
             Dashboard
           </button>
+          <button
+  onClick={() => setActiveTab('feedback')}
+  className={`${
+    activeTab === 'feedback'
+      ? 'border-primary-500 text-primary-600'
+      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+  } whitespace-nowrap py-4 px-4 md:px-6 border-b-2 font-medium text-sm`}
+>
+  Feedback
+</button>
+ 
           <button
             onClick={() => setActiveTab('opportunities')}
             className={`${
@@ -337,6 +371,19 @@ const VolunteerDashboard = () => {
           </div>
         </div>
       )}
+      {activeTab === 'feedback' && (
+  <div>
+    <h3 className="text-xl font-semibold text-secondary-800 mb-6">Student Feedback</h3>
+ 
+    {loadingFeedback ? (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600"></div>
+      </div>
+    ) : (
+      <FeedbackList feedback={feedback} averageRating={averageRating} />
+    )}
+  </div>
+)}
 
       {/* Sessions Tab */}
       {activeTab === 'sessions' && (

@@ -5,6 +5,7 @@ import DashboardLayout from './DashboardLayout';
 import { getUserInfo } from '../../utils/auth';
 import StudentChatbot from '../chatbot/StudentChatbot';
 import VideoConferencing from './VideoConferencing';
+import FeedbackForm from '../feedback/FeedbackForm';
 
 const StudentDashboard = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -18,6 +19,32 @@ const StudentDashboard = () => {
     class: '',
     rollNumber: '',
     email: '',
+  });
+  const [completedSessions, setCompletedSessions] = useState([
+    {
+      id: 1,
+      subject: 'Mathematics',
+      topic: 'Algebra',
+      date: 'March 25, 2025',
+      volunteerName: 'Dr. Sunil Kumar',
+      volunteerId: 1,
+      hasFeedback: false
+    },
+    {
+      id: 2,
+      subject: 'Science',
+      topic: 'Physics Experiments',
+      date: 'March 15, 2025',
+      volunteerName: 'Prof. Neha Gupta',
+      volunteerId: 2,
+      hasFeedback: true,
+      feedback: 'The session was very informative and helpful.'
+    },
+  ]);
+  const [showFeedbackModal, setShowFeedbackModal] = useState({
+    show: false,
+    sessionId: null,
+    volunteerId: null
   });
 
   const userInfo = getUserInfo();
@@ -40,9 +67,22 @@ const StudentDashboard = () => {
         setLoading(false);
       }
     };
+    const fetchCompletedSessions = async () => {
+      try {
+        // This would normally fetch from your API
+        // For now, we'll just use the mock data we initialized with
+        console.log('Fetching completed sessions...');
+        // In the future, you would uncomment this:
+        // const { data } = await api.get('/api/sessions/completed');
+        // setCompletedSessions(data);
+      } catch (error) {
+        console.error('Error fetching completed sessions:', error);
+      }
+    };
 
     fetchProfile();
   }, []);
+  
 
   const handleChange = (e) => {
     setFormData({
@@ -213,6 +253,45 @@ const StudentDashboard = () => {
               </div>
             </div>
           </div>
+          <h3 className="text-xl font-semibold text-secondary-800 mb-4 mt-8">Completed Sessions</h3>
+<div className="space-y-4">
+  {completedSessions.map((session) => (
+    <div key={session.id} className="border border-gray-200 rounded-lg p-4 bg-white">
+      <div className="flex justify-between items-start">
+        <div>
+          <h4 className="text-lg font-medium text-gray-900">{session.subject}: {session.topic}</h4>
+          <p className="text-sm text-gray-600 mt-1">
+            Volunteer: {session.volunteerName} | Date: {session.date}
+          </p>
+        </div>
+        <span className="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded">
+          Completed
+        </span>
+      </div>
+ 
+      <div className="mt-4">
+        {session.hasFeedback ? (
+          <div className="text-sm text-gray-600">
+            <span className="font-medium">Your feedback:</span> {session.feedback}
+          </div>
+        ) : (
+          <button 
+            onClick={() => setShowFeedbackModal({ show: true, sessionId: session.id, volunteerId: session.volunteerId })}
+            className="text-primary-600 hover:text-primary-800 text-sm font-medium"
+          >
+            Provide Feedback
+          </button>
+        )}
+      </div>
+    </div>
+  ))}
+ 
+  {completedSessions.length === 0 && (
+    <div className="text-center py-4">
+      <p className="text-gray-500">No completed sessions yet.</p>
+    </div>
+  )}
+</div>
         </div>
       )}
       {activeTab === 'liveClasses' && (
@@ -344,6 +423,35 @@ const StudentDashboard = () => {
           )}
         </div>
       )}
+      {showFeedbackModal.show && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div className="bg-white rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
+      <div className="p-6">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-lg font-semibold text-gray-900">Provide Feedback</h3>
+          <button 
+            onClick={() => setShowFeedbackModal({ show: false, sessionId: null, volunteerId: null })}
+            className="text-gray-500 hover:text-gray-700"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+ 
+        <FeedbackForm 
+          volunteerId={showFeedbackModal.volunteerId} 
+          sessionId={showFeedbackModal.sessionId}
+          onSubmitSuccess={() => {
+            setShowFeedbackModal({ show: false, sessionId: null, volunteerId: null });
+            // Optionally refresh completed sessions data
+            fetchCompletedSessions();
+          }} 
+        />
+      </div>
+    </div>
+  </div>
+)}
       
       {/* Chatbot Tab */}
       {activeTab === 'chatbot' && (

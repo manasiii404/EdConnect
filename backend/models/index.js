@@ -1,12 +1,12 @@
+// backend/models/index.js
 const { sequelize } = require('../config/db');
 const User = require('./User');
 const Student = require('./Student');
 const School = require('./School');
 const Volunteer = require('./Volunteer');
-const Class = require('./Class');
-const VolunteerRequest = require('./VolunteerRequest');
+const Feedback = require('./Feedback'); // Add this line
 
-// Define associations with consistent aliases
+// Define associations
 User.hasOne(Student, { foreignKey: 'userId' });
 Student.belongsTo(User, { foreignKey: 'userId' });
 
@@ -16,34 +16,12 @@ School.belongsTo(User, { foreignKey: 'userId' });
 User.hasOne(Volunteer, { foreignKey: 'userId' });
 Volunteer.belongsTo(User, { foreignKey: 'userId' });
 
-// School-Class associations
-School.hasMany(Class, { 
-  foreignKey: 'schoolId',
-  as: 'classes'  // plural for hasMany
-});
-Class.belongsTo(School, { 
-  foreignKey: 'schoolId',
-  as: 'school'   // singular for belongsTo
-});
+// Add feedback associations
+Student.hasMany(Feedback, { foreignKey: 'studentId' });
+Feedback.belongsTo(Student, { foreignKey: 'studentId' });
 
-// VolunteerRequest associations
-School.hasMany(VolunteerRequest, { 
-  foreignKey: 'schoolId',
-  as: 'volunteerRequests'
-});
-VolunteerRequest.belongsTo(School, { 
-  foreignKey: 'schoolId',
-  as: 'school'
-});
-
-Class.hasMany(VolunteerRequest, { 
-  foreignKey: 'classId',
-  as: 'volunteerRequests'
-});
-VolunteerRequest.belongsTo(Class, { 
-  foreignKey: 'classId',
-  as: 'class'  // singular alias
-});
+Volunteer.hasMany(Feedback, { foreignKey: 'volunteerId' });
+Feedback.belongsTo(Volunteer, { foreignKey: 'volunteerId' });
 
 // Export models
 module.exports = {
@@ -52,6 +30,5 @@ module.exports = {
   Student,
   School,
   Volunteer,
-  Class,
-  VolunteerRequest,
+  Feedback,  // Add this line
 };

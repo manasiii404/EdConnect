@@ -1,11 +1,11 @@
-// Update backend/server.js to include chatbot routes
 const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
 const { connectDB, sequelize } = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
-const chatbotRoutes = require('./routes/chatbotRoutes'); // Add this line
+const chatbotRoutes = require('./routes/chatbotRoutes'); 
+const feedbackRoutes = require('./routes/feedbackRoutes'); // Add this line
 
 dotenv.config();
 
@@ -21,7 +21,8 @@ app.use(express.json());
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
-app.use('/api/chatbot', chatbotRoutes); // Add this line
+app.use('/api/chatbot', chatbotRoutes);
+app.use('/api/feedback', feedbackRoutes); // Add this line
 
 // Sync database
 (async () => {
