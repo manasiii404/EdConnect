@@ -1,0 +1,80 @@
+.entity-selection-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f7f9fc;
+  }
+  
+  .entity-selection-card {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 40px;
+    width: 100%;
+    max-width: 500px;
+    text-align: center;
+  }
+  
+  .entity-selection-card h2 {
+    color: #2c3e50;
+    margin-bottom: 10px;
+  }
+  
+  .entity-selection-card p {
+    color: #7f8c8d;
+    margin-bottom: 30px;
+  }
+  
+  .entity-selection-card h3 {
+    color: #34495e;
+    margin-bottom: 20px;
+  }
+  
+  .entity-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 30px;
+  }
+  
+  .entity-button {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 12px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.3s;
+  }
+  
+  .entity-button:hover {
+    background-color: #2980b9;
+  }
+  
+  .login-section {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #ecf0f1;
+  }
+  
+  .login-button {
+    background-color: transparent;
+    color: #3498db;
+    border: 1px solid #3498db;
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s;
+    display: inline-block;
+    margin-top: 10px;
+  }
+  
+  .login-button:hover {
+    background-color: #3498db;
+    color: white;
+  }
