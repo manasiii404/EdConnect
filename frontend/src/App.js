@@ -10,9 +10,6 @@ import NotFoundPage from './pages/NotFoundPage';
 
 // Auth Components
 import Login from './components/auth/Login';
-import StudentRegistration from './components/auth/StudentRegistration';
-import SchoolRegistration from './components/auth/SchoolRegistration';
-import VolunteerRegistration from './components/auth/VolunteerRegistration';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -26,9 +23,6 @@ function App() {
         {/* Public Routes */}
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/register/student" element={<StudentRegistration />} />
-        <Route path="/register/school" element={<SchoolRegistration />} />
-        <Route path="/register/volunteer" element={<VolunteerRegistration />} />
         
         {/* Protected Routes */}
         <Route 
