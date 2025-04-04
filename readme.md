@@ -53,3 +53,73 @@ Interactive sessions which will be recorded for future use :point_up:
 
 ---
 
+Setup and Installation
+Prerequisites
+
+Node.js (v14 or later)
+npm (v6 or later)
+PostgreSQL (v12 or later)
+Python (v3.8 or later)
+
+Installation Steps
+
+Clone the repository:
+
+bashCopygit clone https://github.com/yourusername/edconnect.git
+cd edconnect
+
+Install backend dependencies:
+
+bashCopycd backend
+npm install
+
+Install Python dependencies for AI features:
+
+bashCopycd scripts
+pip install -r requirements.txt
+
+Install frontend dependencies:
+
+bashCopycd ../frontend
+npm install
+
+Set up the PostgreSQL database:
+
+bashCopy# Create a PostgreSQL database named 'edconnect'
+createdb edconnect
+
+Set up environment variables:
+Create a .env file in the backend directory with the following variables:
+
+Copy# Database Configuration
+DB_NAME=edconnect
+DB_USER=your_db_username
+DB_PASSWORD=your_db_password
+DB_HOST=localhost
+DB_PORT=5432
+
+# JWT Secret
+JWT_SECRET=your_jwt_secret_key
+
+# OpenAI API Key
+OPENAI_API_KEY=your_openai_api_key
+
+# HuggingFace API Key
+HUGGINGFACE_API_KEY=your_huggingface_token
+HF_TOKEN=your_huggingface_token
+
+Start the backend server:
+
+bashCopycd backend
+node server.js
+
+Start the frontend development server:
+
+bashCopycd frontend
+npm start
+
+Access the application:
+
+Frontend: http://localhost:3000
+Backend API: http://localhost:5000
+
