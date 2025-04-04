@@ -71,7 +71,8 @@ Interactive sessions with automatic recording capabilities for future use. 🧑�
 
 
 
-
+## Project Flow
+![Image](https://github.com/user-attachments/assets/70c5b2c5-4aff-48c9-8e74-6f09bdde8520)
 
 
 ## ⚙️ **Setup & Installation**
