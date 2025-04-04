@@ -82,5 +82,67 @@ Interactive sessions with automatic recording capabilities for future use. :poin
 
 #### 1️⃣ Clone the Repository
 ```bash
-git clone https://github.com/yourusername/edconnect.git
-cd edconnect
+
+2️⃣ Install Backend Dependencies
+bash
+Copy
+Edit
+cd backend
+npm install
+3️⃣ Install Python Dependencies for AI Features
+bash
+Copy
+Edit
+cd scripts
+pip install -r requirements.txt
+4️⃣ Install Frontend Dependencies
+bash
+Copy
+Edit
+cd ../frontend
+npm install
+5️⃣ Set Up PostgreSQL Database
+bash
+Copy
+Edit
+# Create a PostgreSQL database named 'edconnect'
+createdb edconnect
+6️⃣ Set Up Environment Variables
+Create a .env file in the backend directory with the following values:
+
+env
+Copy
+Edit
+# Database Configuration
+DB_NAME=edconnect
+DB_USER=your_db_username
+DB_PASSWORD=your_db_password
+DB_HOST=localhost
+DB_PORT=5432
+
+# JWT Secret
+JWT_SECRET=your_jwt_secret_key
+
+# OpenAI API Key
+OPENAI_API_KEY=your_openai_api_key
+
+# HuggingFace API Key
+HUGGINGFACE_API_KEY=your_huggingface_token
+HF_TOKEN=your_huggingface_token
+▶️ Run the Application
+Start the Backend Server
+bash
+Copy
+Edit
+cd backend
+node server.js
+Start the Frontend Development Server
+bash
+Copy
+Edit
+cd frontend
+npm start
+🌐 Access the Application
+Frontend: http://localhost:3000
+
+Backend API: http://localhost:5000
