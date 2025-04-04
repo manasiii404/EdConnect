@@ -81,7 +81,8 @@ Interactive sessions with automatic recording capabilities for future use. :poin
 ### 📦 **Installation Steps**
 
 #### 1️⃣ Clone the Repository
-
+git clone https://github.com/yourusername/edconnect.git
+cd edconnect
 
 #### 2️⃣ Install Backend Dependencies
 
@@ -98,7 +99,7 @@ cd ../frontend
 npm install
 #### 5️⃣ Set Up PostgreSQL Database
 
-# Create a PostgreSQL database named 'edconnect'
+#### Create a PostgreSQL database named 'edconnect'
 createdb edconnect
 #### 6️⃣ Set Up Environment Variables
 Create a .env file in the backend directory with the following values:
