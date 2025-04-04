@@ -1,11 +1,11 @@
-**About the project **
+**About the project**
 
 EdConnect is a platform designed to bridge the gap in education by connecting Zilla Parishad schools with expert volunteers. The platform enables schools to upload curriculum topics they need assistance with, while volunteers can register, teach live or recorded sessions, and track their contributions. Key features include session tracking, feedback systems, AI-based volunteer matching, gamification, multi-language support, and automated reminders, all aimed at improving student engagement and enhancing the quality of education in underserved schools
 
 
 **Extensive Features:-**
 
-<img width="1070" alt="Image" src="https://github.com/user-attachments/assets/c52de8f8-f888-4709-8b6c-11f77a00ca4b" />
+<img width="100" alt="Image" src="https://github.com/user-attachments/assets/c52de8f8-f888-4709-8b6c-11f77a00ca4b" />
 <br>
 <br>
 
