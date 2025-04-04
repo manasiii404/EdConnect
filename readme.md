@@ -4,6 +4,12 @@ EdConnect is a platform designed to bridge the gap in education by connecting Zi
 
 <br>
 <br>
+<B>Tech Stack</B>
+<br>
+<br>
+![Image](https://github.com/user-attachments/assets/58159e43-270d-4f9a-a80c-e209af0458f5)
+
+
 <B>Extensive Features:-</B>
 <br>
 <br>
