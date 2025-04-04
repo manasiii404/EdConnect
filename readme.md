@@ -47,7 +47,8 @@
 ### 📊 **Smart Feedback System**
 **Smart Feedback System** – Uses sentiment analysis to automatically generate accurate and unbiased ratings for volunteers based on real student feedback. :point_up:
 ---
-
+<br>
+<br>
 
 
 <img src="https://github.com/user-attachments/assets/fd015bcb-3eab-4cc7-946a-226d0d48f971" width="700"/>
@@ -56,7 +57,8 @@
 
 ### 🤖 **Chatbot
 **CHATBOT** – A smart, conversational AI assistant that answers all your questions based on any uploaded document. :point_up:
-
+<br>
+<br>
 ---
 
 
