@@ -30,7 +30,7 @@ CHATBOT – An intelligent, interactive AI assistant that answers all your quest
 
 <img width="700" alt="Image" src="https://github.com/user-attachments/assets/be53f0b4-28e3-46fb-bba7-eebc0dcada93" />
 
-Smart Feedback System – Leverages sentiment analysis to automatically generate accurate and unbiased ratings for volunteers based on student feedback. :point_up:
+<B>Smart Feedback System</B> – Leverages sentiment analysis to automatically generate accurate and unbiased ratings for volunteers based on student feedback. :point_up:
 <br>
 <br>
 <br>
