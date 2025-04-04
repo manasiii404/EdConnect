@@ -8,13 +8,16 @@ EdConnect is a platform designed to bridge the gap in education by connecting Zi
 <br>
 <br>
 
-![Image1](https://github.com/user-attachments/assets/865bf445-b764-48b0-9a75-916928ea1ddf =100x100)
-![Image2](https://github.com/user-attachments/assets/9708f051-0417-451d-9dd2-58cd4cb69011 =100x100)
-![Image3](https://github.com/user-attachments/assets/511f564d-d234-4eaa-a34b-0f3bc577eb6a =100x100)
-![Image4](https://github.com/user-attachments/assets/e1fd3d6d-9b5d-424a-903b-1024019d2e35 =100x100)
-![Image5](https://github.com/user-attachments/assets/0ff9af38-bafd-496c-b0dd-4fd032dc5bb2 =100x100)
-![Image6](https://github.com/user-attachments/assets/b738598f-88c4-422d-9c45-9a9f3e0ec844 =100x100)
-![Image7](https://github.com/user-attachments/assets/bbc5772b-edd4-48ac-8d50-3093d35e9c81 =100x100)
+![Image](https://github.com/user-attachments/assets/865bf445-b764-48b0-9a75-916928ea1ddf)
+
+![Image](https://github.com/user-attachments/assets/9708f051-0417-451d-9dd2-58cd4cb69011)
+
+![Image](https://github.com/user-attachments/assets/511f564d-d234-4eaa-a34b-0f3bc577eb6a)
+
+![Image](https://github.com/user-attachments/assets/e1fd3d6d-9b5d-424a-903b-1024019d2e35)
+![Image](https://github.com/user-attachments/assets/0ff9af38-bafd-496c-b0dd-4fd032dc5bb2)
+![Image](https://github.com/user-attachments/assets/b738598f-88c4-422d-9c45-9a9f3e0ec844)
+![Image](https://github.com/user-attachments/assets/bbc5772b-edd4-48ac-8d50-3093d35e9c81)
 
 <B>Extensive Features:-</B>
 <br>
