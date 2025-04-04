@@ -42,33 +42,32 @@
 
 ## 🚀 **Extensive Features**
 
-<img src="https://github.com/user-attachments/assets/c52de8f8-f888-4709-8b6c-11f77a00ca4b" width="700"/>
+---
 
 ### 📊 **Smart Feedback System**
-**Smart Feedback System** – Uses sentiment analysis to automatically generate accurate and unbiased ratings for volunteers based on real student feedback. :point_up:
----
-<br>
-<br>
 
+<img src="https://github.com/user-attachments/assets/c52de8f8-f888-4709-8b6c-11f77a00ca4b" width="700"/>
+
+Automatically uses sentiment analysis to generate accurate and unbiased ratings for volunteers based on real student feedback. 📈
+
+---
+
+### 🤖 **Chatbot**
 
 <img src="https://github.com/user-attachments/assets/fd015bcb-3eab-4cc7-946a-226d0d48f971" width="700"/>
 
+A smart, conversational AI assistant that answers all your questions based on any uploaded document. 🧠
 
-
-### 🤖 **Chatbot
-**CHATBOT** – A smart, conversational AI assistant that answers all your questions based on any uploaded document. :point_up:
-<br>
-<br>
 ---
 
-
-<img src="https://github.com/user-attachments/assets/be53f0b4-28e3-46fb-bba7-eebc0dcada93" width="700"/>
-<br>
 ### 🎥 **Live Classes**
 
-Interactive sessions with automatic recording capabilities for future use. :point_up:
+<img src="https://github.com/user-attachments/assets/be53f0b4-28e3-46fb-bba7-eebc0dcada93" width="700"/>
+
+Interactive sessions with automatic recording capabilities for future use. 🧑‍🏫
 
 ---
+
 
 
 
